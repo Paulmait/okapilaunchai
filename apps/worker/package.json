@@ -1,0 +1,23 @@
+{
+  "name": "@okapilaunch/worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm build && node --watch dist/main.js",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js",
+    "lint": "echo \"(add eslint)\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@okapilaunch/ai-router": "workspace:*",
+    "@okapilaunch/core": "workspace:*",
+    "@supabase/supabase-js": "^2.47.10",
+    "archiver": "^7.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/node": "^22.10.2",
+    "@types/archiver": "^6.0.3"
+  }
+}

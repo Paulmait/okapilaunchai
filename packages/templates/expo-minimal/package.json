@@ -1,0 +1,16 @@
+{
+  "name": "okapilaunch-generated-app",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo run:ios",
+    "lint": "echo \"(add lint)\""
+  },
+  "dependencies": {
+    "expo": "~51.0.0",
+    "react": "18.2.0",
+    "react-native": "0.74.0",
+    "expo-router": "~3.5.0"
+  }
+}

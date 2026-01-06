@@ -1,0 +1,27 @@
+{
+  "name": "okapilaunch-ai",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "pnpm run --parallel dev:web dev:worker",
+    "dev:web": "pnpm --filter @okapilaunch/web dev",
+    "dev:worker": "pnpm --filter @okapilaunch/worker dev",
+    "build": "pnpm -r build",
+    "build:web": "pnpm --filter @okapilaunch/web build",
+    "build:worker": "pnpm --filter @okapilaunch/worker build",
+    "start": "pnpm run --parallel start:web start:worker",
+    "start:web": "pnpm --filter @okapilaunch/web start",
+    "start:worker": "pnpm --filter @okapilaunch/worker start",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test:e2e": "node --experimental-strip-types scripts/e2e.ts",
+    "clean": "pnpm -r exec -- rm -rf dist node_modules/.cache",
+    "db:migrate": "supabase db push",
+    "db:reset": "supabase db reset"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.5.16",
+    "@types/adm-zip": "^0.5.5",
+    "typescript": "^5.6.3"
+  }
+}
