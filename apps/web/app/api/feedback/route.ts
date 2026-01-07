@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabase";
 import { getSupabaseServer } from "../../../lib/supabase-server";
 import { checkRateLimit, getClientId, RATE_LIMITS } from "../../../lib/rate-limit";
+import { isAdmin } from "../../../lib/admin";
 import { z } from "zod";
 
 const FeedbackSchema = z.object({
@@ -85,7 +86,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  // Only allow service role / admin access
+  // Only allow admin access
   const authClient = getSupabaseServer();
   const { data: { user } } = await authClient.auth.getUser();
 
@@ -93,8 +94,11 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
 
-  // In production, check if user is admin
-  // For now, allow authenticated users to see their own feedback
+  // Require admin role
+  if (!isAdmin(user.email)) {
+    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+  }
+
   const supabase = getSupabaseAdmin();
 
   const { searchParams } = new URL(req.url);

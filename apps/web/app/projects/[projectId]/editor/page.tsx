@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Header from "../../../../components/Header";
 import { getSupabaseBrowser } from "../../../../lib/supabase-browser";
+import { useToast } from "../../../../components/Toast";
 
 // Dynamic import for Monaco to prevent SSR issues
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
@@ -126,6 +127,7 @@ const styles = StyleSheet.create({
 export default function EditorPage() {
   const params = useParams();
   const router = useRouter();
+  const { showToast } = useToast();
   const projectId = params.projectId as string;
 
   const [project, setProject] = useState<any>(null);
@@ -213,7 +215,7 @@ export default function EditorPage() {
     if (selectedFile) {
       selectedFile.content = fileContent;
       setUnsavedChanges(false);
-      alert("Changes saved! (In production, this would update the project files)");
+      showToast("success", "Changes saved! (In production, this would update the project files)");
     }
   }
 
@@ -396,7 +398,7 @@ export default function EditorPage() {
             Save
           </button>
           <button
-            onClick={() => alert("Build functionality coming soon!")}
+            onClick={() => showToast("info", "Build functionality coming soon!")}
             style={{
               padding: "6px 16px",
               backgroundColor: "#6366f1",

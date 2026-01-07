@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useToast } from "../../../components/Toast";
 
 type Job = {
   id: string;
@@ -40,6 +41,7 @@ const AI_THINKING_STEPS = [
 
 export default function ProjectPage({ params }: { params: { projectId: string } }) {
   const { projectId } = params;
+  const { showToast } = useToast();
   const [project, setProject] = useState<Project | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,13 +86,18 @@ export default function ProjectPage({ params }: { params: { projectId: string } 
   }, [jobs]);
 
   async function download(jobId: string) {
-    const res = await fetch(`/api/jobs/${jobId}/download`, { cache: "no-store" });
-    const json = await res.json();
-    if (!res.ok) {
-      alert(json.error ?? "Download not ready");
-      return;
+    try {
+      const res = await fetch(`/api/jobs/${jobId}/download`, { cache: "no-store" });
+      const json = await res.json();
+      if (!res.ok) {
+        showToast("error", json.error ?? "Download not ready");
+        return;
+      }
+      showToast("success", "Starting download...");
+      window.location.href = json.url;
+    } catch (err) {
+      showToast("error", "Failed to start download. Please try again.");
     }
-    window.location.href = json.url;
   }
 
   const isProcessing = jobs.some((j) => j.status === "queued" || j.status === "running");

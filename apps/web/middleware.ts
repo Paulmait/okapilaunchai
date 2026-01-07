@@ -2,7 +2,15 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ["/projects", "/new", "/dashboard", "/settings"];
+const PROTECTED_ROUTES = ["/projects", "/new", "/dashboard", "/settings", "/publish", "/subscribe"];
+
+// Routes that require admin access
+const ADMIN_ROUTES = ["/admin"];
+
+// Admin emails (in production, use a database role or Supabase custom claims)
+const ADMIN_EMAILS = [
+  process.env.ADMIN_EMAIL || "admin@okapilaunch.com"
+];
 
 // Routes that are public
 const PUBLIC_ROUTES = ["/", "/login", "/signup", "/auth/callback", "/pricing"];
@@ -17,8 +25,9 @@ export async function middleware(request: NextRequest) {
 
   // Check if route needs protection
   const isProtectedRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
+  const isAdminRoute = ADMIN_ROUTES.some((route) => pathname.startsWith(route));
 
-  if (!isProtectedRoute) {
+  if (!isProtectedRoute && !isAdminRoute) {
     return NextResponse.next();
   }
 
@@ -67,11 +76,20 @@ export async function middleware(request: NextRequest) {
     data: { user }
   } = await supabase.auth.getUser();
 
-  // If no user and trying to access protected route, redirect to login
-  if (!user && isProtectedRoute) {
+  // If no user and trying to access protected/admin route, redirect to login
+  if (!user && (isProtectedRoute || isAdminRoute)) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // If admin route, check if user is admin
+  if (isAdminRoute && user) {
+    const isAdmin = ADMIN_EMAILS.includes(user.email || "");
+    if (!isAdmin) {
+      // Redirect non-admins to dashboard
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
   }
 
   return response;

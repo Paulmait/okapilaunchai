@@ -164,6 +164,13 @@ git push  # Triggers Railway auto-deploy
 
 ## Recent Changes (January 7, 2026)
 
+### Security Fixes (QC Review)
+- **CRITICAL**: Added admin route protection in middleware (`/admin` now requires admin email)
+- **CRITICAL**: Added admin role checks to `/api/analytics` and `/api/feedback` GET endpoints
+- **CRITICAL**: Added manual usage counter increment after project creation (backup for DB trigger)
+- Added `/publish` and `/subscribe` to protected routes in middleware
+- Created `lib/admin.ts` helper for admin authorization
+
 ### Subscription System
 - Added `subscriptions` and `usage` database tables
 - Stripe integration with checkout and webhooks
@@ -179,10 +186,13 @@ git push  # Triggers Railway auto-deploy
 - Added Publish button to navigation header
 - Edit Code and Push to GitHub buttons on project sidebar
 - Updated pricing page with new tiers
+- **NEW**: Added toast notification system (replaced all `alert()` calls)
+- Toast provider wraps entire app via `components/Providers.tsx`
 
 ### Bug Fixes
 - Fixed `.single()` query errors for new users (changed to `.maybeSingle()`)
 - Auto-create subscription/usage records on first API call
+- Replaced browser `alert()` with toast notifications across all pages
 
 ---
 

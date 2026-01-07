@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import Header from "../../../../components/Header";
 import { getSupabaseBrowser } from "../../../../lib/supabase-browser";
+import { useToast } from "../../../../components/Toast";
 
 export default function GitHubPage() {
   const params = useParams();
+  const { showToast } = useToast();
   const projectId = params.projectId as string;
 
   const [project, setProject] = useState<any>(null);
@@ -52,7 +54,7 @@ export default function GitHubPage() {
 
   async function connectGitHub() {
     // In production, this would redirect to GitHub OAuth
-    alert("GitHub OAuth integration coming soon! For now, you can download your export and push manually.");
+    showToast("info", "GitHub OAuth integration coming soon! For now, download your export and push manually.");
     setGithubConnected(true);
   }
 
@@ -60,7 +62,7 @@ export default function GitHubPage() {
     setPushing(true);
     // Simulate pushing
     await new Promise(resolve => setTimeout(resolve, 2000));
-    alert("Repository created and code pushed! (Simulated - full integration coming soon)");
+    showToast("success", "Repository created and code pushed! (Simulated - full integration coming soon)");
     setPushing(false);
   }
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabase";
 import { getSupabaseServer } from "../../../lib/supabase-server";
 import { getAnalyticsSummary, getInvestorMetrics } from "../../../lib/analytics";
+import { isAdmin } from "../../../lib/admin";
 
 export async function GET(req: Request) {
   // Require authentication
@@ -10,6 +11,11 @@ export async function GET(req: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  // Require admin role
+  if (!isAdmin(user.email)) {
+    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
   }
 
   const { searchParams } = new URL(req.url);

@@ -134,6 +134,17 @@ export async function POST(req: Request) {
 
     const projectId = project.id;
 
+    // Manually increment usage counter (backup in case DB trigger doesn't fire)
+    // The DB trigger should handle this, but we do it manually for safety
+    await supabase
+      .from("usage")
+      .update({
+        projects_created: (usage?.projects_created || 0) + 1,
+        last_project_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq("user_id", userId);
+
     // Queue initial "plan" job
     const { data: job, error: jobError } = await supabase
       .from("jobs")

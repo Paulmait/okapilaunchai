@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata, Viewport } from "next";
 import ClientWidgets from "../components/ClientWidgets";
 import Header from "../components/Header";
+import { Providers } from "../components/Providers";
 
 export const viewport: Viewport = {
   themeColor: "#6366f1",
@@ -75,10 +76,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           color: "#1e1b4b"
         }}
       >
-        <Header />
-        <main style={{ minHeight: "calc(100vh - 60px)" }}>{children}</main>
-        <ClientWidgets />
-        <footer
+        <Providers>
+          <Header />
+          <main style={{ minHeight: "calc(100vh - 60px)" }}>{children}</main>
+          <ClientWidgets />
+          <footer
           style={{
             padding: "40px 20px",
             borderTop: "1px solid #e0e7ff",
@@ -97,6 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             2026 OkapiLaunch AI. Build App Store-ready apps in minutes.
           </p>
         </footer>
+        </Providers>
       </body>
     </html>
   );

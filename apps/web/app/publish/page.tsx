@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Header from "../../components/Header";
 import { getSupabaseBrowser } from "../../lib/supabase-browser";
+import { useToast } from "../../components/Toast";
 
 interface Project {
   id: string;
@@ -19,6 +20,7 @@ interface Project {
 }
 
 export default function PublishPage() {
+  const { showToast } = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState<{ plan: string } | null>(null);
@@ -226,7 +228,7 @@ export default function PublishPage() {
                     </Link>
                     {isPro ? (
                       <button
-                        onClick={() => alert("App Store publishing coming soon! Download your export and upload via Transporter for now.")}
+                        onClick={() => showToast("info", "App Store publishing coming soon! Download your export and upload via Transporter for now.")}
                         style={{
                           padding: "10px 16px",
                           background: "linear-gradient(135deg, #059669 0%, #10b981 100%)",
