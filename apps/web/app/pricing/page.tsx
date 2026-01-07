@@ -11,10 +11,10 @@ const plans = [
   {
     name: "Free",
     price: "$0",
-    period: "forever",
+    period: "/month",
     description: "Perfect for exploring and prototyping",
     features: [
-      "3 app projects",
+      "3 app projects per month",
       "AI-powered app generation",
       "Basic Expo export",
       "Privacy policy generator",
@@ -218,7 +218,7 @@ export default function PricingPage() {
           {[
             {
               q: "What do I get in the free tier?",
-              a: "You can create up to 3 app projects with full AI generation, basic Expo export, and auto-generated privacy policy. Perfect for prototyping and learning."
+              a: "You can create up to 3 app projects per month with full AI generation, basic Expo export, and auto-generated privacy policy. Perfect for prototyping and learning."
             },
             {
               q: "Do I need a credit card to start?",

@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import type { Metadata, Viewport } from "next";
 import ClientWidgets from "../components/ClientWidgets";
+import Header from "../components/Header";
 
 export const viewport: Viewport = {
   themeColor: "#6366f1",
@@ -74,56 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           color: "#1e1b4b"
         }}
       >
-        <nav
-          style={{
-            padding: "12px 20px",
-            borderBottom: "1px solid #e0e7ff",
-            backgroundColor: "#fff",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            position: "sticky",
-            top: 0,
-            zIndex: 100
-          }}
-        >
-          <Link href="/" style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: 10 }}>
-            <img src="/favicon.svg" alt="OkapiLaunch AI" width={32} height={32} />
-            <span style={{ fontSize: 18, fontWeight: 700, color: "#1e1b4b" }}>
-              OkapiLaunch<span style={{ fontWeight: 300, color: "#6366f1" }}>AI</span>
-            </span>
-          </Link>
-          <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
-            <Link href="/pricing" style={{ color: "#6366f1", textDecoration: "none", fontSize: 14, fontWeight: 500 }}>
-              Pricing
-            </Link>
-            <Link
-              href="/login"
-              style={{
-                color: "#6366f1",
-                textDecoration: "none",
-                fontSize: 14,
-                fontWeight: 500
-              }}
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/new"
-              style={{
-                color: "#fff",
-                textDecoration: "none",
-                fontSize: 14,
-                fontWeight: 600,
-                padding: "8px 16px",
-                background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                borderRadius: 8
-              }}
-            >
-              Start Building
-            </Link>
-          </div>
-        </nav>
+        <Header />
         <main style={{ minHeight: "calc(100vh - 60px)" }}>{children}</main>
         <ClientWidgets />
         <footer

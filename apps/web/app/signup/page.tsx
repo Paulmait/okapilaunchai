@@ -5,12 +5,21 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getSupabaseBrowser } from "../../lib/supabase-browser";
 
+function generateSecurePassword(): string {
+  const length = 16;
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+  const array = new Uint32Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array, (x) => charset[x % charset.length]).join("");
+}
+
 function SignupForm() {
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/";
+  const redirect = searchParams.get("redirect") || "/dashboard";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -79,15 +88,58 @@ function SignupForm() {
 
       <label style={{ display: "grid", gap: 4 }}>
         Password
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
-          style={{ padding: 12, borderRadius: 8, border: "1px solid #ddd" }}
-          placeholder="At least 6 characters"
-        />
+        <div style={{ position: "relative" }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6}
+            style={{ padding: 12, borderRadius: 8, border: "1px solid #ddd", width: "100%", boxSizing: "border-box", paddingRight: 100 }}
+            placeholder="At least 6 characters"
+          />
+          <div style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", display: "flex", gap: 4 }}>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#6366f1",
+                cursor: "pointer",
+                fontSize: 12,
+                padding: "4px 8px"
+              }}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const newPassword = generateSecurePassword();
+                setPassword(newPassword);
+                setShowPassword(true);
+              }}
+              style={{
+                background: "#f0f0ff",
+                border: "1px solid #6366f1",
+                color: "#6366f1",
+                cursor: "pointer",
+                fontSize: 12,
+                padding: "4px 8px",
+                borderRadius: 4,
+                fontWeight: 500
+              }}
+            >
+              Generate
+            </button>
+          </div>
+        </div>
+        {password && showPassword && (
+          <span style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>
+            Save this password - you'll need it to log in!
+          </span>
+        )}
       </label>
 
       <button
