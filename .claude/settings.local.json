@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(dir:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: Complete OkapiLaunch AI implementation\n\n- Add Zod validation schemas for wizard payloads and API requests\n- Complete Create Project API with Supabase integration\n- Add Supabase Auth with login/signup pages and middleware\n- Add RLS policies for security \\(projects, jobs, storage\\)\n- Implement worker main loop with graceful shutdown\n- Add job types: plan, build_mvp, export with auto-progression\n- Create dashboard with project listing and status polling\n- Enhance project page with pipeline progress visualization\n- Add comprehensive E2E test with artifact validation\n- Update root package.json for Windows pnpm dev support\n- Add .gitignore for security\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "WebFetch(domain:rork.com)",
+      "WebSearch",
+      "Bash(pnpm install:*)",
+      "Bash(node scripts/setup-db.mjs:*)",
+      "Bash(pnpm add:*)",
+      "Bash(node scripts/migrate.mjs:*)",
+      "Bash(pnpm build:*)"
     ]
   }
 }

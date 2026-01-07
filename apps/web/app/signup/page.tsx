@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import React, { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getSupabaseBrowser } from "../../lib/supabase-browser";
 
-export default function SignupPage() {
-  const router = useRouter();
+function SignupForm() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/";
 
@@ -46,70 +45,66 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <main style={{ maxWidth: 400, margin: "0 auto", padding: "40px 20px" }}>
-        <h1 style={{ marginTop: 0 }}>Check your email</h1>
+      <div>
+        <h2>Check your email</h2>
         <p>
           We've sent a confirmation link to <strong>{email}</strong>. Click the link to activate your account.
         </p>
         <Link href="/login" style={{ color: "#111" }}>
           Back to login
         </Link>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main style={{ maxWidth: 400, margin: "0 auto", padding: "40px 20px" }}>
-      <h1 style={{ marginTop: 0 }}>Create Account</h1>
+    <form onSubmit={handleSignup} style={{ display: "grid", gap: 16 }}>
+      {error && (
+        <div style={{ padding: 12, background: "#fee", color: "#c00", borderRadius: 8 }}>
+          {error}
+        </div>
+      )}
 
-      <form onSubmit={handleSignup} style={{ display: "grid", gap: 16 }}>
-        {error && (
-          <div style={{ padding: 12, background: "#fee", color: "#c00", borderRadius: 8 }}>
-            {error}
-          </div>
-        )}
+      <label style={{ display: "grid", gap: 4 }}>
+        Email
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={{ padding: 12, borderRadius: 8, border: "1px solid #ddd" }}
+          placeholder="you@example.com"
+        />
+      </label>
 
-        <label style={{ display: "grid", gap: 4 }}>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ padding: 12, borderRadius: 8, border: "1px solid #ddd" }}
-            placeholder="you@example.com"
-          />
-        </label>
+      <label style={{ display: "grid", gap: 4 }}>
+        Password
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+          style={{ padding: 12, borderRadius: 8, border: "1px solid #ddd" }}
+          placeholder="At least 6 characters"
+        />
+      </label>
 
-        <label style={{ display: "grid", gap: 4 }}>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            style={{ padding: 12, borderRadius: 8, border: "1px solid #ddd" }}
-            placeholder="At least 6 characters"
-          />
-        </label>
-
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: 14,
-            borderRadius: 8,
-            border: "none",
-            background: "#111",
-            color: "#fff",
-            cursor: loading ? "wait" : "pointer",
-            opacity: loading ? 0.6 : 1
-          }}
-        >
-          {loading ? "Creating account..." : "Create Account"}
-        </button>
-      </form>
+      <button
+        type="submit"
+        disabled={loading}
+        style={{
+          padding: 14,
+          borderRadius: 8,
+          border: "none",
+          background: "#111",
+          color: "#fff",
+          cursor: loading ? "wait" : "pointer",
+          opacity: loading ? 0.6 : 1
+        }}
+      >
+        {loading ? "Creating account..." : "Create Account"}
+      </button>
 
       <p style={{ marginTop: 20, textAlign: "center", color: "#666" }}>
         Already have an account?{" "}
@@ -117,6 +112,17 @@ export default function SignupPage() {
           Sign in
         </Link>
       </p>
+    </form>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <main style={{ maxWidth: 400, margin: "0 auto", padding: "40px 20px" }}>
+      <h1 style={{ marginTop: 0 }}>Create Account</h1>
+      <Suspense fallback={<div>Loading...</div>}>
+        <SignupForm />
+      </Suspense>
     </main>
   );
 }

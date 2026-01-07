@@ -20,8 +20,9 @@
     "db:reset": "supabase db reset"
   },
   "devDependencies": {
-    "adm-zip": "^0.5.16",
     "@types/adm-zip": "^0.5.5",
+    "adm-zip": "^0.5.16",
+    "pg": "^8.16.3",
     "typescript": "^5.6.3"
   }
 }
