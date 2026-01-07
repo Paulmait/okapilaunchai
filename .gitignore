@@ -48,3 +48,6 @@ artifacts/
 # Misc
 *.pem
 *.key
+
+# Claude Code
+.claude/settings.local.json

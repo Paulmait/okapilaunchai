@@ -1,9 +1,16 @@
 import React from "react";
 import Link from "next/link";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import ClientWidgets from "../components/ClientWidgets";
 
+export const viewport: Viewport = {
+  themeColor: "#6366f1",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://okapilaunch.com"),
   title: {
     default: "OkapiLaunch AI - Build App Store-Ready iOS Apps in Minutes",
     template: "%s | OkapiLaunch AI"
@@ -48,8 +55,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
     apple: "/logo.svg"
-  },
-  themeColor: "#6366f1"
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
