@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import ClientWidgets from "../components/ClientWidgets";
 
 export const metadata: Metadata = {
   title: {
@@ -118,6 +119,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </nav>
         <main style={{ minHeight: "calc(100vh - 60px)" }}>{children}</main>
+        <ClientWidgets />
         <footer
           style={{
             padding: "40px 20px",

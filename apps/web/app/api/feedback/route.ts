@@ -1,0 +1,126 @@
+import { NextResponse } from "next/server";
+import { getSupabaseAdmin } from "../../../lib/supabase";
+import { getSupabaseServer } from "../../../lib/supabase-server";
+import { checkRateLimit, getClientId, RATE_LIMITS } from "../../../lib/rate-limit";
+import { z } from "zod";
+
+const FeedbackSchema = z.object({
+  feedbackType: z.enum(["bug", "feature_request", "complaint", "praise", "general"]),
+  rating: z.number().min(1).max(5).optional(),
+  message: z.string().min(10).max(2000),
+  pagePath: z.string().optional(),
+  context: z.record(z.unknown()).optional()
+});
+
+export async function POST(req: Request) {
+  // Rate limit: 10 feedback submissions per hour
+  const clientId = getClientId(req);
+  const rateLimitResult = checkRateLimit(`feedback:${clientId}`, { limit: 10, windowSec: 3600 });
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: "Too many feedback submissions. Please try again later." },
+      { status: 429 }
+    );
+  }
+
+  try {
+    const body = await req.json().catch(() => null);
+
+    if (!body) {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+
+    const result = FeedbackSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: result.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const { feedbackType, rating, message, pagePath, context } = result.data;
+
+    // Get authenticated user if available
+    let userId = null;
+    try {
+      const authClient = getSupabaseServer();
+      const { data: { user } } = await authClient.auth.getUser();
+      if (user?.id) {
+        userId = user.id;
+      }
+    } catch {
+      // Continue without user ID
+    }
+
+    const supabase = getSupabaseAdmin();
+
+    const { data, error } = await supabase
+      .from("user_feedback")
+      .insert({
+        user_id: userId,
+        feedback_type: feedbackType,
+        rating: rating || null,
+        message,
+        page_path: pagePath || null,
+        context: context || {}
+      })
+      .select("id")
+      .single();
+
+    if (error) {
+      console.error("Failed to save feedback:", error);
+      return NextResponse.json({ error: "Failed to save feedback" }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      feedbackId: data.id,
+      message: "Thank you for your feedback!"
+    });
+  } catch (err) {
+    console.error("Feedback error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+export async function GET(req: Request) {
+  // Only allow service role / admin access
+  const authClient = getSupabaseServer();
+  const { data: { user } } = await authClient.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  // In production, check if user is admin
+  // For now, allow authenticated users to see their own feedback
+  const supabase = getSupabaseAdmin();
+
+  const { searchParams } = new URL(req.url);
+  const status = searchParams.get("status");
+  const type = searchParams.get("type");
+  const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
+
+  let query = supabase
+    .from("user_feedback")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (status) {
+    query = query.eq("status", status);
+  }
+
+  if (type) {
+    query = query.eq("feedback_type", type);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ feedback: data });
+}

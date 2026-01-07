@@ -6,8 +6,12 @@ import pg from "pg";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { config } from "dotenv";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Load .env file from project root
+config({ path: path.join(__dirname, "..", ".env") });
 
 // IMPORTANT: Set DATABASE_URL in your environment or .env file
 // Format: postgresql://postgres:PASSWORD@db.YOUR_PROJECT.supabase.co:5432/postgres
@@ -23,7 +27,8 @@ if (!DATABASE_URL) {
 const migrations = [
   "0001_init.sql",
   "0002_storage_exports_bucket.sql",
-  "0003_rls_policies.sql"
+  "0003_rls_policies.sql",
+  "0004_analytics_and_feedback.sql"
 ];
 
 async function runMigrations() {
@@ -67,7 +72,7 @@ async function runMigrations() {
 
     // Verify tables exist
     console.log("📋 Verifying tables...");
-    const tables = ["projects", "jobs", "ai_decisions", "ai_runs"];
+    const tables = ["projects", "jobs", "ai_decisions", "ai_runs", "analytics_events", "user_feedback", "nps_responses"];
 
     for (const table of tables) {
       try {
