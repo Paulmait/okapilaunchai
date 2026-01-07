@@ -1,0 +1,8 @@
+# Railway configuration for OkapiLaunch AI monorepo
+# Deploy two services from this repo: web and worker
+
+[build]
+builder = "nixpacks"
+
+# This file is for documentation - use Railway dashboard to configure services
+# See DEPLOY.md for step-by-step instructions
