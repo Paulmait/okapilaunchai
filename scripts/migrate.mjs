@@ -9,7 +9,16 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const DATABASE_URL = "postgresql://postgres:SjnXumhU3pALw0xC@db.dgezhxhqmiaghvlmqvxd.supabase.co:5432/postgres";
+// IMPORTANT: Set DATABASE_URL in your environment or .env file
+// Format: postgresql://postgres:PASSWORD@db.YOUR_PROJECT.supabase.co:5432/postgres
+const DATABASE_URL = process.env.DATABASE_URL;
+
+if (!DATABASE_URL) {
+  console.error("❌ Missing DATABASE_URL environment variable");
+  console.error("   Set it in your .env file or environment");
+  console.error("   Format: postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres");
+  process.exit(1);
+}
 
 const migrations = [
   "0001_init.sql",

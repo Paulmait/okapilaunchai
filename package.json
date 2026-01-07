@@ -3,7 +3,8 @@
   "private": true,
   "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "dev": "pnpm run --parallel dev:web dev:worker",
+    "dev": "pnpm --filter @okapilaunch/web dev",
+    "dev:all": "pnpm -r --parallel dev",
     "dev:web": "pnpm --filter @okapilaunch/web dev",
     "dev:worker": "pnpm --filter @okapilaunch/worker dev",
     "build": "pnpm -r build",

@@ -7,7 +7,12 @@ import { createClient } from "@supabase/supabase-js";
 import fs from "node:fs";
 import path from "node:path";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://dgezhxhqmiaghvlmqvxd.supabase.co";
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+
+if (!SUPABASE_URL) {
+  console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_URL");
+  process.exit(1);
+}
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_SERVICE_KEY) {
@@ -136,7 +141,7 @@ async function main(): Promise<void> {
   console.log("\n================================");
   console.log("Setup complete!");
   console.log("\nIf tables are missing, run the SQL migrations manually:");
-  console.log("1. Go to: https://supabase.com/dashboard/project/dgezhxhqmiaghvlmqvxd/sql");
+  console.log("1. Go to your Supabase dashboard SQL editor");
   console.log("2. Run each file in order:");
   console.log("   - supabase/migrations/0001_init.sql");
   console.log("   - supabase/migrations/0002_storage_exports_bucket.sql");

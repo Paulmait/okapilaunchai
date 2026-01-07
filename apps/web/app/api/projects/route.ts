@@ -123,15 +123,29 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
+    // Get authenticated user
+    const authClient = getSupabaseServer();
+    const { data: { user } } = await authClient.auth.getUser();
+
     const supabase = getSupabaseAdmin();
 
-    // For MVP: return all projects. In production, filter by authenticated user_id.
-    // TODO: Add auth filter
-    const { data: projects, error } = await supabase
+    // Filter by authenticated user_id or show anonymous projects if not logged in
+    const userId = user?.id;
+    let query = supabase
       .from("projects")
       .select("id, name, created_at")
       .order("created_at", { ascending: false })
       .limit(50);
+
+    if (userId) {
+      // Show user's own projects
+      query = query.eq("user_id", userId);
+    } else {
+      // Not logged in - only show anonymous projects (if any)
+      query = query.eq("user_id", "anonymous");
+    }
+
+    const { data: projects, error } = await query;
 
     if (error) {
       console.error("Failed to fetch projects:", error);
