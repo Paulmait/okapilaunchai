@@ -48,16 +48,56 @@ export async function POST(req: Request) {
     const wizard = wizardResult.data;
     const supabase = getSupabaseAdmin();
 
-    // Get authenticated user if available
-    let userId = "anonymous";
-    try {
-      const authClient = getSupabaseServer();
-      const { data: { user } } = await authClient.auth.getUser();
-      if (user?.id) {
-        userId = user.id;
-      }
-    } catch {
-      // Continue with anonymous if auth check fails
+    // Require authentication
+    const authClient = getSupabaseServer();
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: "Please sign in to create a project", code: "AUTH_REQUIRED" },
+        { status: 401 }
+      );
+    }
+
+    const userId = user.id;
+
+    // Check subscription and usage limits
+    const { data: subscription } = await supabase
+      .from("subscriptions")
+      .select("plan, status")
+      .eq("user_id", userId)
+      .single();
+
+    const { data: usage } = await supabase
+      .from("usage")
+      .select("projects_created")
+      .eq("user_id", userId)
+      .single();
+
+    const plan = subscription?.plan || "free";
+    const projectsCreated = usage?.projects_created || 0;
+
+    // Define limits per plan
+    const limits: Record<string, number> = {
+      free: 1,
+      pro: 999999,
+      team: 999999
+    };
+
+    const projectLimit = limits[plan] || 1;
+
+    if (projectsCreated >= projectLimit) {
+      return NextResponse.json(
+        {
+          error: plan === "free"
+            ? "You've used your free project. Upgrade to Pro for unlimited projects!"
+            : "Project limit reached",
+          code: "LIMIT_REACHED",
+          usage: { projects_created: projectsCreated, limit: projectLimit },
+          upgradeUrl: "/pricing"
+        },
+        { status: 403 }
+      );
     }
 
     // Create project

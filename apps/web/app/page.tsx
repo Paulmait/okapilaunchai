@@ -25,7 +25,7 @@ const features = [
   {
     icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
     title: "Free to Start",
-    description: "Build 3 apps per month for free. No credit card required. Upgrade only when you're ready to ship."
+    description: "Try your first app free. No credit card required. Upgrade for unlimited projects."
   },
   {
     icon: "M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",

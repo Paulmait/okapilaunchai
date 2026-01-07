@@ -67,6 +67,12 @@ export default function Header() {
             <Link href="/dashboard" style={{ color: "#6366f1", textDecoration: "none", fontSize: 14, fontWeight: 500 }}>
               Dashboard
             </Link>
+            <Link href="/publish" style={{ color: "#059669", textDecoration: "none", fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Publish
+            </Link>
             <button
               onClick={handleLogout}
               style={{

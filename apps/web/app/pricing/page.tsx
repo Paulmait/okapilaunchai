@@ -11,40 +11,41 @@ const plans = [
   {
     name: "Free",
     price: "$0",
-    period: "/month",
-    description: "Perfect for exploring and prototyping",
+    period: "one-time",
+    description: "Try OkapiLaunch with one free project",
     features: [
-      "3 app projects per month",
+      "1 app project (lifetime)",
       "AI-powered app generation",
       "Basic Expo export",
-      "Privacy policy generator",
+      "Privacy policy included",
       "Community support"
     ],
-    cta: "Start Free",
+    cta: "Try Free",
     href: "/new",
     highlighted: false
   },
   {
     name: "Pro",
-    price: "$19",
+    price: "$29",
     period: "/month",
     description: "For indie developers ready to ship",
     features: [
       "Unlimited projects",
       "Priority AI generation",
-      "App Store asset pack",
+      "In-app code editor",
+      "GitHub integration",
       "Full legal docs bundle",
-      "App Store submission guide",
-      "Email support",
-      "Export history (30 days)"
+      "App Store asset pack",
+      "Export history (30 days)",
+      "Email support"
     ],
-    cta: "Start Pro Trial",
-    href: "/new?plan=pro",
+    cta: "Start Pro",
+    href: "/subscribe?plan=pro",
     highlighted: true
   },
   {
     name: "Team",
-    price: "$49",
+    price: "$79",
     period: "/month",
     description: "For agencies and teams",
     features: [
@@ -52,12 +53,13 @@ const plans = [
       "5 team members",
       "White-label exports",
       "Custom branding",
-      "Priority support",
       "API access",
-      "Export history (1 year)"
+      "Export history (1 year)",
+      "Priority support",
+      "Dedicated onboarding"
     ],
-    cta: "Contact Sales",
-    href: "mailto:team@okapilaunch.com",
+    cta: "Start Team",
+    href: "/subscribe?plan=team",
     highlighted: false
   }
 ];
@@ -218,7 +220,7 @@ export default function PricingPage() {
           {[
             {
               q: "What do I get in the free tier?",
-              a: "You can create up to 3 app projects per month with full AI generation, basic Expo export, and auto-generated privacy policy. Perfect for prototyping and learning."
+              a: "You get 1 free app project to try OkapiLaunch. This includes full AI generation, basic Expo export, and auto-generated privacy policy. Perfect for testing if OkapiLaunch is right for you."
             },
             {
               q: "Do I need a credit card to start?",

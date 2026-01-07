@@ -28,7 +28,8 @@ const migrations = [
   "0001_init.sql",
   "0002_storage_exports_bucket.sql",
   "0003_rls_policies.sql",
-  "0004_analytics_and_feedback.sql"
+  "0004_analytics_and_feedback.sql",
+  "20260107_subscriptions.sql"
 ];
 
 async function runMigrations() {
@@ -72,7 +73,7 @@ async function runMigrations() {
 
     // Verify tables exist
     console.log("📋 Verifying tables...");
-    const tables = ["projects", "jobs", "ai_decisions", "ai_runs", "analytics_events", "user_feedback", "nps_responses"];
+    const tables = ["projects", "jobs", "ai_decisions", "ai_runs", "analytics_events", "user_feedback", "nps_responses", "subscriptions", "usage"];
 
     for (const table of tables) {
       try {
