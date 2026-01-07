@@ -1,6 +1,7 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import type { CookieOptions } from "@supabase/ssr";
 
 export async function GET() {
   const cookieStore = cookies();
@@ -32,45 +33,40 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Get usage
-  const { data: usage, error: usageError } = await supabase
+  // Get usage - use maybeSingle() to avoid errors for new users
+  const { data: usage } = await supabase
     .from("usage")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   // Get subscription
-  const { data: subscription, error: subError } = await supabase
+  const { data: subscription } = await supabase
     .from("subscriptions")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
-  // If no usage record exists, create one (for existing users)
-  if (usageError && usageError.code === "PGRST116") {
-    const serviceClient = createServerClient(
-      url,
-      process.env.SUPABASE_SERVICE_ROLE_KEY || "",
-      {
-        cookies: {
-          get(name: string) { return cookieStore.get(name)?.value; },
-          set() {},
-          remove() {}
-        }
-      }
-    );
+  // If no records exist, create them for new/existing users
+  if (!usage || !subscription) {
+    const { getSupabaseAdmin } = await import("../../../lib/supabase");
+    const adminClient = getSupabaseAdmin();
 
-    await serviceClient.from("usage").insert({
-      user_id: user.id,
-      projects_limit: 1,
-      projects_created: 0
-    });
+    if (!usage) {
+      await adminClient.from("usage").insert({
+        user_id: user.id,
+        projects_limit: 1,
+        projects_created: 0
+      });
+    }
 
-    await serviceClient.from("subscriptions").insert({
-      user_id: user.id,
-      plan: "free",
-      status: "active"
-    });
+    if (!subscription) {
+      await adminClient.from("subscriptions").insert({
+        user_id: user.id,
+        plan: "free",
+        status: "active"
+      });
+    }
 
     return NextResponse.json({
       usage: { projects_created: 0, projects_limit: 1 },

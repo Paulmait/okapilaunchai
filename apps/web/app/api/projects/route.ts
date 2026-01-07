@@ -62,17 +62,31 @@ export async function POST(req: Request) {
     const userId = user.id;
 
     // Check subscription and usage limits
+    // Use maybeSingle() to avoid errors when no row exists (new users)
     const { data: subscription } = await supabase
       .from("subscriptions")
       .select("plan, status")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
     const { data: usage } = await supabase
       .from("usage")
       .select("projects_created")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
+
+    // Initialize records for new users if they don't exist
+    if (!subscription) {
+      await supabase
+        .from("subscriptions")
+        .insert({ user_id: userId, plan: "free", status: "active" });
+    }
+
+    if (!usage) {
+      await supabase
+        .from("usage")
+        .insert({ user_id: userId, projects_created: 0, projects_limit: 1 });
+    }
 
     const plan = subscription?.plan || "free";
     const projectsCreated = usage?.projects_created || 0;
