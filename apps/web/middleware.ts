@@ -2,7 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ["/projects", "/new"];
+const PROTECTED_ROUTES = ["/projects", "/new", "/dashboard", "/settings"];
 
 // Routes that are public
 const PUBLIC_ROUTES = ["/", "/login", "/signup", "/auth/callback", "/pricing"];

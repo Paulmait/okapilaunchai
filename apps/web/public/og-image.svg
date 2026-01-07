@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1b4b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2e1065;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="200" fill="#6366f1" opacity="0.1"/>
+  <circle cx="1100" cy="530" r="250" fill="#8b5cf6" opacity="0.1"/>
+
+  <!-- Logo -->
+  <circle cx="600" cy="240" r="120" fill="url(#logoGrad)"/>
+  <path d="M600 140 L660 220 L660 320 L600 360 L540 320 L540 220 Z" fill="#ffffff" opacity="0.95"/>
+  <circle cx="600" cy="220" r="30" fill="#06b6d4"/>
+  <ellipse cx="600" cy="390" rx="40" ry="20" fill="#06b6d4" opacity="0.9"/>
+
+  <!-- Text -->
+  <text x="600" y="480" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="700" fill="#ffffff">
+    OkapiLaunch AI
+  </text>
+  <text x="600" y="540" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="#e0e7ff">
+    Build App Store-Ready iOS Apps in Minutes
+  </text>
+</svg>

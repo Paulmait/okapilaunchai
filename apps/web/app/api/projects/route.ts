@@ -3,8 +3,26 @@ import { getSupabaseAdmin } from "../../../lib/supabase";
 import { getSupabaseServer } from "../../../lib/supabase-server";
 import { WizardPayloadSchema } from "@okapilaunch/core";
 import { ZodError } from "zod";
+import { checkRateLimit, getClientId, RATE_LIMITS } from "../../../lib/rate-limit";
 
 export async function POST(req: Request) {
+  // Rate limit: 5 project creations per minute
+  const clientId = getClientId(req);
+  const rateLimitResult = checkRateLimit(`projects:create:${clientId}`, RATE_LIMITS.heavy);
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": "5",
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": String(rateLimitResult.resetTime)
+        }
+      }
+    );
+  }
   try {
     const body = await req.json().catch(() => null);
 

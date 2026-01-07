@@ -39,6 +39,104 @@ function getTemplatesRoot() {
   return candidates[0]; // fallback
 }
 
+function getLegalTemplatesRoot() {
+  const candidates = [
+    path.resolve(process.cwd(), "../../packages/templates/legal"),
+    path.resolve(process.cwd(), "../packages/templates/legal"),
+    path.resolve(process.cwd(), "packages/templates/legal")
+  ];
+
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+
+  return candidates[0];
+}
+
+function generateLegalDocs(wizard: any, outputDir: string) {
+  const legalTemplatesDir = getLegalTemplatesRoot();
+  ensureDir(outputDir);
+
+  const replacements: Record<string, string> = {
+    "{{APP_NAME}}": wizard.name || "App",
+    "{{APP_DESCRIPTION}}": wizard.description || "A mobile application",
+    "{{COMPANY_NAME}}": wizard.companyName || "App Developer",
+    "{{SUPPORT_EMAIL}}": wizard.supportEmail || "support@example.com",
+    "{{COMPANY_ADDRESS}}": wizard.companyAddress || "Address not provided",
+    "{{JURISDICTION}}": wizard.jurisdiction || "Delaware, USA",
+    "{{#if AUTH_APPLE}}": wizard.authApple ? "" : "<!--",
+    "{{/if}}": wizard.authApple ? "" : "-->",
+    "{{#if SUBSCRIPTION}}": wizard.subscription ? "" : "<!--",
+  };
+
+  // Process privacy policy
+  const privacyTemplatePath = path.join(legalTemplatesDir, "privacy-policy.md");
+  if (fs.existsSync(privacyTemplatePath)) {
+    let privacyContent = fs.readFileSync(privacyTemplatePath, "utf-8");
+    for (const [key, value] of Object.entries(replacements)) {
+      privacyContent = privacyContent.replaceAll(key, value);
+    }
+    // Clean up conditional blocks
+    privacyContent = privacyContent.replace(/<!--[\s\S]*?-->/g, "");
+    fs.writeFileSync(path.join(outputDir, "PRIVACY_POLICY.md"), privacyContent, "utf-8");
+  } else {
+    // Generate basic privacy policy
+    fs.writeFileSync(
+      path.join(outputDir, "PRIVACY_POLICY.md"),
+      `# Privacy Policy for ${wizard.name || "App"}
+
+**Last Updated: ${new Date().toISOString().split("T")[0]}**
+
+This app respects your privacy. We collect minimal data necessary to provide the service.
+
+## Data Collection
+- Account information (email)
+- Usage data for app improvement
+
+## Your Rights
+You can delete your data at any time from the Settings screen.
+
+## Contact
+For privacy inquiries, contact: support@example.com
+`,
+      "utf-8"
+    );
+  }
+
+  // Process terms of service
+  const termsTemplatePath = path.join(legalTemplatesDir, "terms-of-service.md");
+  if (fs.existsSync(termsTemplatePath)) {
+    let termsContent = fs.readFileSync(termsTemplatePath, "utf-8");
+    for (const [key, value] of Object.entries(replacements)) {
+      termsContent = termsContent.replaceAll(key, value);
+    }
+    termsContent = termsContent.replace(/<!--[\s\S]*?-->/g, "");
+    fs.writeFileSync(path.join(outputDir, "TERMS_OF_SERVICE.md"), termsContent, "utf-8");
+  } else {
+    fs.writeFileSync(
+      path.join(outputDir, "TERMS_OF_SERVICE.md"),
+      `# Terms of Service for ${wizard.name || "App"}
+
+**Last Updated: ${new Date().toISOString().split("T")[0]}**
+
+By using this app, you agree to these terms.
+
+## Use of Service
+Use this app only for lawful purposes.
+
+## Disclaimers
+The app is provided "as is" without warranties.
+
+## Contact
+For questions, contact: support@example.com
+`,
+      "utf-8"
+    );
+  }
+
+  console.log(`[Worker] Generated legal documents in ${outputDir}`);
+}
+
 export async function pollAndRunOnce(): Promise<boolean> {
   const supabase = getSupabaseAdmin();
 
@@ -262,8 +360,11 @@ async function handleBuildMvpJob(
     artifactsDir
   });
 
-  // Write legal and screenshot outputs
-  ensureDir(path.join(artifactsDir, "legal"));
+  // Generate legal documents from templates
+  const legalDir = path.join(artifactsDir, "legal");
+  generateLegalDocs(wizard, legalDir);
+
+  // Also write AI-generated legal content if available
   ensureDir(path.join(artifactsDir, "screenshots"));
 
   const legalText = nodeResults
@@ -272,14 +373,7 @@ async function handleBuildMvpJob(
     .join("\n\n---\n\n");
 
   if (legalText) {
-    fs.writeFileSync(path.join(artifactsDir, "legal", "LEGAL_OUTPUT.txt"), legalText, "utf-8");
-  } else {
-    // Write placeholder if no legal content generated
-    fs.writeFileSync(
-      path.join(artifactsDir, "legal", "LEGAL_OUTPUT.txt"),
-      `Privacy Policy for ${wizard.name || "App"}\n\nThis app respects your privacy.\n\nLast updated: ${new Date().toISOString().split("T")[0]}`,
-      "utf-8"
-    );
+    fs.writeFileSync(path.join(artifactsDir, "legal", "AI_LEGAL_OUTPUT.txt"), legalText, "utf-8");
   }
 
   const screenshotJson = nodeResults
@@ -414,8 +508,9 @@ async function handleDefaultJob(
     artifactsDir
   });
 
-  // Write outputs
-  ensureDir(path.join(artifactsDir, "legal"));
+  // Generate legal documents from templates
+  const legalDir = path.join(artifactsDir, "legal");
+  generateLegalDocs(wizard, legalDir);
   ensureDir(path.join(artifactsDir, "screenshots"));
 
   const legalText = nodeResults
@@ -423,7 +518,9 @@ async function handleDefaultJob(
     .map((r) => r.outputText!)
     .join("\n\n---\n\n");
 
-  fs.writeFileSync(path.join(artifactsDir, "legal", "LEGAL_OUTPUT.txt"), legalText, "utf-8");
+  if (legalText) {
+    fs.writeFileSync(path.join(artifactsDir, "legal", "AI_LEGAL_OUTPUT.txt"), legalText, "utf-8");
+  }
 
   const screenshotJson = nodeResults
     .map((r) => r.outputText ?? "")

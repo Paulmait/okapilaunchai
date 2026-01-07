@@ -1,0 +1,46 @@
+{
+  "name": "OkapiLaunch AI",
+  "tagline": "Build App Store-Ready iOS Apps in Minutes",
+  "colors": {
+    "primary": {
+      "hex": "#6366f1",
+      "name": "Indigo",
+      "usage": "Primary buttons, links, accents"
+    },
+    "secondary": {
+      "hex": "#8b5cf6",
+      "name": "Purple",
+      "usage": "Gradients, hover states"
+    },
+    "accent": {
+      "hex": "#06b6d4",
+      "name": "Cyan",
+      "usage": "Success states, highlights"
+    },
+    "dark": {
+      "hex": "#1e1b4b",
+      "name": "Deep Indigo",
+      "usage": "Text, backgrounds"
+    },
+    "light": {
+      "hex": "#e0e7ff",
+      "name": "Light Indigo",
+      "usage": "Backgrounds, borders"
+    }
+  },
+  "typography": {
+    "primary": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    "weights": [
+      "400 (Regular)",
+      "500 (Medium)",
+      "600 (Semibold)",
+      "700 (Bold)"
+    ]
+  },
+  "assets": {
+    "logo": "/logo.svg",
+    "icon": "/favicon.svg",
+    "wordmark": "/wordmark.svg",
+    "ogImage": "/og-image.svg"
+  }
+}
