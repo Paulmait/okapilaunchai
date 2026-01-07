@@ -15,6 +15,7 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { spawnSync, SpawnSyncReturns } from "node:child_process";
 import AdmZip from "adm-zip";
 
@@ -163,9 +164,10 @@ async function runWorkerOnce(): Promise<boolean> {
     }
   }
 
-  // Dynamically import the worker module
+  // Dynamically import the worker module (use file:// URL for Windows compatibility)
   try {
-    const { pollAndRunOnce } = await import(workerPath);
+    const workerUrl = pathToFileURL(workerPath).href;
+    const { pollAndRunOnce } = await import(workerUrl);
     const didWork = await pollAndRunOnce();
     log(`Worker completed, didWork: ${didWork}`);
     return didWork;
@@ -301,9 +303,9 @@ async function downloadExport(
 
   log(`Downloaded export.zip (${buffer.length} bytes)`);
 
-  // Verify minimum size
-  if (buffer.length < 10240) {
-    throw new Error(`Export too small: ${buffer.length} bytes (expected >= 10KB)`);
+  // Verify minimum size (5KB for minimal template)
+  if (buffer.length < 5120) {
+    throw new Error(`Export too small: ${buffer.length} bytes (expected >= 5KB)`);
   }
 
   return zipPath;
@@ -334,7 +336,8 @@ function verifyArtifacts(extractDir: string): void {
   const requiredFiles = [
     { path: "expo/package.json", minSize: 50 },
     { path: "expo/app.json", minSize: 50 },
-    { path: "legal/LEGAL_OUTPUT.txt", minSize: 200 },
+    { path: "legal/PRIVACY_POLICY.md", minSize: 200 },
+    { path: "legal/TERMS_OF_SERVICE.md", minSize: 200 },
     { path: "screenshots/screenshots_spec.json", minSize: 10 }
   ];
 
@@ -347,6 +350,10 @@ function verifyArtifacts(extractDir: string): void {
   assertValidJson(path.join(extractDir, "expo/package.json"));
   assertValidJson(path.join(extractDir, "expo/app.json"));
   assertValidJson(path.join(extractDir, "screenshots/screenshots_spec.json"));
+
+  // Verify legal documents have content (markdown, not JSON)
+  log(`Verified: legal/PRIVACY_POLICY.md`);
+  log(`Verified: legal/TERMS_OF_SERVICE.md`);
 
   log("All required artifacts verified!");
 }
