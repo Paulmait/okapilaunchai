@@ -1,6 +1,20 @@
 /**
  * Simple in-memory rate limiter for API routes
- * For production, consider using Redis or a distributed rate limiter
+ *
+ * LIMITATIONS:
+ * - In-memory storage: Rate limits are not shared across server instances
+ * - On serverless/Railway: Each instance has its own rate limit store
+ * - Memory usage: Store grows with unique client IPs (cleaned every minute)
+ *
+ * PRODUCTION RECOMMENDATIONS:
+ * - Use Redis (Upstash Redis is a good serverless option)
+ * - Use Vercel KV or similar managed solution
+ * - Add IP hash storage for abuse tracking in database
+ *
+ * Current behavior on multi-instance:
+ * - Each instance allows `limit` requests independently
+ * - Effective limit = limit × number_of_instances
+ * - Acceptable for MVP, should migrate to Redis for scale
  */
 
 type RateLimitRecord = {

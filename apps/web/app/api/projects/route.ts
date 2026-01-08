@@ -196,9 +196,21 @@ export async function GET() {
 
     // Filter by authenticated user_id or show anonymous projects if not logged in
     const userId = user?.id;
+
+    // Include latest job for each project to avoid N+1 queries
     let query = supabase
       .from("projects")
-      .select("id, name, created_at")
+      .select(`
+        id,
+        name,
+        created_at,
+        jobs (
+          id,
+          type,
+          status,
+          created_at
+        )
+      `)
       .order("created_at", { ascending: false })
       .limit(50);
 
@@ -220,7 +232,28 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json({ projects: projects ?? [] });
+    // Transform projects to include latestJob for dashboard display
+    const projectsWithLatestJob = (projects ?? []).map((p: any) => {
+      const jobs = p.jobs ?? [];
+      // Sort jobs by created_at descending and get the first one
+      const sortedJobs = jobs.sort((a: any, b: any) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      const latestJob = sortedJobs[0] ?? null;
+
+      return {
+        id: p.id,
+        name: p.name,
+        created_at: p.created_at,
+        latestJob: latestJob ? {
+          id: latestJob.id,
+          type: latestJob.type,
+          status: latestJob.status
+        } : null
+      };
+    });
+
+    return NextResponse.json({ projects: projectsWithLatestJob });
   } catch (err) {
     console.error("Unexpected error:", err);
     return NextResponse.json(

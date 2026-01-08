@@ -3,21 +3,21 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
-type Project = {
-  id: string;
-  name: string;
-  created_at: string;
-};
-
 type Job = {
   id: string;
   type: string;
   status: "queued" | "running" | "succeeded" | "failed";
 };
 
+type Project = {
+  id: string;
+  name: string;
+  created_at: string;
+  latestJob: Job | null;
+};
+
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [projectJobs, setProjectJobs] = useState<Record<string, Job | null>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,26 +31,8 @@ export default function DashboardPage() {
         return;
       }
 
+      // API now returns projects with latestJob included (single query)
       setProjects(json.projects ?? []);
-
-      // Fetch latest job for each project
-      const jobPromises = (json.projects ?? []).map(async (p: Project) => {
-        try {
-          const jobRes = await fetch(`/api/projects/${p.id}/jobs`, { cache: "no-store" });
-          const jobJson = await jobRes.json();
-          const jobs = jobJson.jobs ?? [];
-          return { projectId: p.id, job: jobs[0] ?? null };
-        } catch {
-          return { projectId: p.id, job: null };
-        }
-      });
-
-      const jobResults = await Promise.all(jobPromises);
-      const jobMap: Record<string, Job | null> = {};
-      for (const r of jobResults) {
-        jobMap[r.projectId] = r.job;
-      }
-      setProjectJobs(jobMap);
     } catch {
       setError("Network error");
     } finally {
@@ -148,7 +130,6 @@ export default function DashboardPage() {
       {!loading && projects.length > 0 && (
         <div style={{ display: "grid", gap: 12 }}>
           {projects.map((p) => {
-            const latestJob = projectJobs[p.id];
             return (
               <Link
                 key={p.id}
@@ -180,10 +161,10 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    {latestJob && (
+                    {p.latestJob && (
                       <>
-                        <span style={{ color: "#888", fontSize: 12 }}>{latestJob.type}</span>
-                        {getStatusBadge(latestJob.status)}
+                        <span style={{ color: "#888", fontSize: 12 }}>{p.latestJob.type}</span>
+                        {getStatusBadge(p.latestJob.status)}
                       </>
                     )}
                   </div>

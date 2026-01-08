@@ -39,36 +39,50 @@ export default function PublishPage() {
       return;
     }
 
-    // Get projects with their latest completed job
+    // Get projects with their jobs in a single query (avoiding N+1)
     const { data: projectsData } = await supabase
       .from("projects")
-      .select("id, name, description, status, created_at")
+      .select(`
+        id,
+        name,
+        description,
+        status,
+        created_at,
+        jobs (
+          id,
+          status,
+          payload,
+          created_at
+        )
+      `)
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     if (projectsData) {
-      // Get latest job for each project
-      const projectsWithJobs = await Promise.all(
-        projectsData.map(async (project) => {
-          const { data: jobData } = await supabase
-            .from("jobs")
-            .select("id, status, payload")
-            .eq("project_id", project.id)
-            .eq("status", "succeeded")
-            .order("created_at", { ascending: false })
-            .limit(1)
-            .single();
+      // Process to find the latest succeeded job with artifacts
+      const projectsWithJobs = projectsData.map((project: any) => {
+        const jobs = project.jobs ?? [];
+        // Find the latest succeeded job with artifact_object_path
+        const succeededJobs = jobs
+          .filter((j: any) => j.status === "succeeded" && j.payload?.artifact_object_path)
+          .sort((a: any, b: any) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        const latestJob = succeededJobs[0];
 
-          return {
-            ...project,
-            latest_job: jobData ? {
-              id: jobData.id,
-              status: jobData.status,
-              artifact_object_path: jobData.payload?.artifact_object_path
-            } : undefined
-          };
-        })
-      );
+        return {
+          id: project.id,
+          name: project.name,
+          description: project.description,
+          status: project.status,
+          created_at: project.created_at,
+          latest_job: latestJob ? {
+            id: latestJob.id,
+            status: latestJob.status,
+            artifact_object_path: latestJob.payload?.artifact_object_path
+          } : undefined
+        };
+      });
       setProjects(projectsWithJobs);
     }
 
@@ -100,6 +114,30 @@ export default function PublishPage() {
           <p style={{ margin: "8px 0 0", color: "#6b7280" }}>
             Deploy your completed apps to the Apple App Store
           </p>
+        </div>
+
+        {/* Coming Soon Banner */}
+        <div
+          style={{
+            padding: "12px 16px",
+            backgroundColor: "#eff6ff",
+            borderRadius: 10,
+            border: "1px solid #bfdbfe",
+            marginBottom: 24,
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 10
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}>
+            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <div>
+            <span style={{ fontWeight: 600, color: "#1e40af" }}>Automated Publishing Coming Soon</span>
+            <p style={{ margin: "4px 0 0", color: "#3b82f6", fontSize: 14 }}>
+              Direct App Store publishing is in development. For now, download your export and upload via Apple's Transporter app or App Store Connect.
+            </p>
+          </div>
         </div>
 
         {!isPro && (

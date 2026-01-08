@@ -350,6 +350,27 @@ export default function EditorPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#0d1117", display: "flex", flexDirection: "column" }}>
+      {/* Preview Mode Banner */}
+      <div
+        style={{
+          padding: "8px 16px",
+          backgroundColor: "#fef3c7",
+          borderBottom: "1px solid #fcd34d",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span style={{ fontWeight: 600, color: "#92400e", fontSize: 13 }}>Preview Mode</span>
+        <span style={{ color: "#a16207", fontSize: 13 }}>
+          This is a demo with sample files. Full editor with your project files coming soon.
+        </span>
+      </div>
+
       {/* Editor Header */}
       <div
         style={{

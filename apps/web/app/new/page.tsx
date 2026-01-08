@@ -10,7 +10,7 @@ type Wizard = {
   category: string;
   authApple: boolean;
   subscription: boolean;
-  backend: "supabase" | "firebase";
+  backend: "supabase"; // Firebase support coming soon
   deleteMyData: boolean;
 };
 
@@ -319,31 +319,26 @@ export default function NewProjectPage() {
                   <span style={{ display: "block", marginBottom: 8, fontWeight: 500, color: "#374151" }}>
                     Backend Provider
                   </span>
-                  <div style={{ display: "flex", gap: 12 }}>
-                    {[
-                      { value: "supabase", label: "Supabase", icon: "⚡", desc: "PostgreSQL + Auth" },
-                      { value: "firebase", label: "Firebase", icon: "🔥", desc: "NoSQL + Auth" }
-                    ].map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setForm({ ...form, backend: opt.value as any })}
-                        style={{
-                          flex: 1,
-                          padding: 16,
-                          borderRadius: 10,
-                          border: `2px solid ${form.backend === opt.value ? "#6366f1" : "#e5e7eb"}`,
-                          backgroundColor: form.backend === opt.value ? "#eff6ff" : "#fff",
-                          cursor: "pointer",
-                          textAlign: "center"
-                        }}
-                      >
-                        <div style={{ fontSize: 28 }}>{opt.icon}</div>
-                        <div style={{ fontWeight: 600, color: "#1e1b4b" }}>{opt.label}</div>
-                        <div style={{ fontSize: 12, color: "#6b7280" }}>{opt.desc}</div>
-                      </button>
-                    ))}
+                  <div
+                    style={{
+                      padding: 16,
+                      borderRadius: 10,
+                      border: "2px solid #6366f1",
+                      backgroundColor: "#eff6ff",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12
+                    }}
+                  >
+                    <div style={{ fontSize: 28 }}>⚡</div>
+                    <div>
+                      <div style={{ fontWeight: 600, color: "#1e1b4b" }}>Supabase</div>
+                      <div style={{ fontSize: 12, color: "#6b7280" }}>PostgreSQL + Auth + Realtime</div>
+                    </div>
                   </div>
+                  <p style={{ fontSize: 12, color: "#9ca3af", marginTop: 8 }}>
+                    All apps use Supabase for backend. Firebase support coming soon.
+                  </p>
                 </div>
               </div>
             </div>
@@ -471,7 +466,7 @@ export default function NewProjectPage() {
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <span style={{ color: "#6b7280" }}>Backend</span>
-                    <span style={{ fontWeight: 500, color: "#1e1b4b" }}>{form.backend}</span>
+                    <span style={{ fontWeight: 500, color: "#1e1b4b" }}>Supabase</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <span style={{ color: "#6b7280" }}>Features</span>

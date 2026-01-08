@@ -194,21 +194,47 @@ git push  # Triggers Railway auto-deploy
 - Auto-create subscription/usage records on first API call
 - Replaced browser `alert()` with toast notifications across all pages
 
+### Performance Improvements (Latest)
+- **Fixed N+1 queries**: Dashboard and Publish pages now use Supabase joins to fetch projects with jobs in a single query
+- API `/api/projects` GET now returns `latestJob` inline with each project
+
+### Backend Selection
+- **Removed Firebase option** from wizard - all apps now use Supabase backend
+- Firebase support noted as "coming soon" in UI
+
+### Placeholder Features (Clearly Marked)
+- **GitHub Integration**: Added "Coming Soon" banner - OAuth integration in development
+- **Code Editor**: Added "Preview Mode" banner - demo with sample files, not connected to real project
+- **App Store Publish**: Added "Automated Publishing Coming Soon" banner - users should use Transporter for now
+
+### Rate Limiting Documentation
+- Added comprehensive documentation to `lib/rate-limit.ts` explaining:
+  - In-memory limitations on multi-instance deployments
+  - Production recommendations (Redis/Upstash)
+  - Current behavior: `effective_limit = limit × number_of_instances`
+
 ---
 
 ## Known Issues / TODO
 
 ### Pending
 - [ ] Stripe price IDs need to be created in Stripe Dashboard
-- [ ] GitHub OAuth integration (currently shows "coming soon")
-- [ ] App Store Connect integration for Publish feature
-- [ ] Code editor file persistence (currently mock data)
+- [ ] GitHub OAuth integration (placeholder UI with "Coming Soon" banner)
+- [ ] App Store Connect integration for Publish feature (placeholder UI with banner)
+- [ ] Code editor file persistence (demo mode with sample files)
+- [ ] Migrate rate limiting to Redis for multi-instance scaling
 
 ### Technical Debt
 - [ ] Add proper error boundaries
 - [ ] Add loading skeletons
 - [ ] Add E2E tests for subscription flow
 - [ ] Add monitoring/alerting
+
+### Completed (This Session)
+- [x] Fixed N+1 query patterns in dashboard and publish pages
+- [x] Removed Firebase placeholder option (Supabase only)
+- [x] Added "Coming Soon" banners to placeholder features
+- [x] Documented rate limiting limitations
 
 ---
 
