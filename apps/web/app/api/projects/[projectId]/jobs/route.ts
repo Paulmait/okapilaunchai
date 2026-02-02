@@ -32,6 +32,9 @@ export async function GET(_req: Request, { params }: { params: { projectId: stri
     .eq("project_id", params.projectId)
     .order("created_at", { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("Jobs fetch error:", error.message);
+    return NextResponse.json({ error: "Failed to retrieve jobs" }, { status: 500 });
+  }
   return NextResponse.json({ jobs: data ?? [] });
 }

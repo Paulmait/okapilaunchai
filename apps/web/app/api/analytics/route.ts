@@ -20,7 +20,8 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type") || "summary";
-  const days = Math.min(parseInt(searchParams.get("days") || "30"), 365);
+  const daysParam = parseInt(searchParams.get("days") || "30", 10);
+  const days = Math.min(isNaN(daysParam) ? 30 : daysParam, 365);
 
   try {
     if (type === "summary") {
@@ -51,7 +52,8 @@ export async function GET(req: Request) {
         .limit(1000);
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("Usage data fetch error:", error.message);
+        return NextResponse.json({ error: "Failed to retrieve usage data" }, { status: 500 });
       }
 
       // Aggregate by endpoint
@@ -93,7 +95,8 @@ export async function GET(req: Request) {
         .limit(100);
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("Violations fetch error:", error.message);
+        return NextResponse.json({ error: "Failed to retrieve violation data" }, { status: 500 });
       }
 
       // Summary stats

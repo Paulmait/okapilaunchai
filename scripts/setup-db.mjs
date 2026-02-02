@@ -1,11 +1,24 @@
 /**
  * Setup Supabase database - run migrations and create storage bucket
+ *
+ * Usage: Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables before running
+ *   SUPABASE_URL=https://xxx.supabase.co SUPABASE_SERVICE_ROLE_KEY=eyJ... node scripts/setup-db.mjs
  */
 
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = "https://dgezhxhqmiaghvlmqvxd.supabase.co";
-const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZXpoeGhxbWlhZ2h2bG1xdnhkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Nzc0MTg1MCwiZXhwIjoyMDgzMzE3ODUwfQ.g0h7b6urq_DzlIF5an-ZCQoezq8uKcttajuG7ghNfro";
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+  console.error("❌ Missing required environment variables:");
+  console.error("   SUPABASE_URL - Your Supabase project URL");
+  console.error("   SUPABASE_SERVICE_ROLE_KEY - Your Supabase service role key");
+  console.error("\nUsage:");
+  console.error("  SUPABASE_URL=https://xxx.supabase.co SUPABASE_SERVICE_ROLE_KEY=eyJ... node scripts/setup-db.mjs");
+  console.error("\nOr set them in your .env file and use: npx dotenv -- node scripts/setup-db.mjs");
+  process.exit(1);
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
   auth: { persistSession: false }
@@ -135,9 +148,11 @@ async function main() {
   const allTablesExist = Object.values(tableResults).every((r) => r.exists);
 
   if (!allTablesExist) {
+    // Extract project ref from SUPABASE_URL (e.g., "dgezhxhqmiaghvlmqvxd" from "https://dgezhxhqmiaghvlmqvxd.supabase.co")
+    const projectRef = SUPABASE_URL.replace("https://", "").split(".")[0];
     console.log("\n⚠️  Some tables are missing!");
     console.log("   Please run the migrations in Supabase SQL Editor:");
-    console.log("   https://supabase.com/dashboard/project/dgezhxhqmiaghvlmqvxd/sql/new");
+    console.log(`   https://supabase.com/dashboard/project/${projectRef}/sql/new`);
     console.log("\n   Run these files in order:");
     console.log("   1. supabase/migrations/0001_init.sql");
     console.log("   2. supabase/migrations/0002_storage_exports_bucket.sql");

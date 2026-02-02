@@ -52,7 +52,7 @@ export async function POST(req: Request) {
               updated_at: new Date().toISOString()
             });
 
-          console.log(`Subscription activated: ${userId} -> ${plan}`);
+          console.log(`Subscription activated for plan: ${plan}`);
         }
         break;
       }
@@ -116,7 +116,7 @@ export async function POST(req: Request) {
             })
             .eq("user_id", sub.user_id);
 
-          console.log(`Subscription canceled: ${sub.user_id}`);
+          console.log("Subscription canceled");
         }
         break;
       }
@@ -124,7 +124,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ received: true });
   } catch (err: any) {
-    console.error("Webhook error:", err);
-    return NextResponse.json({ error: err.message }, { status: 400 });
+    console.error("Webhook error:", err.message);
+    return NextResponse.json({ error: "Webhook processing failed" }, { status: 400 });
   }
 }

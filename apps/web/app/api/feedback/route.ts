@@ -104,7 +104,12 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
   const type = searchParams.get("type");
-  const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
+  const limitParam = parseInt(searchParams.get("limit") || "50", 10);
+  const limit = Math.min(isNaN(limitParam) ? 50 : limitParam, 100);
+
+  // Validate status and type parameters
+  const validStatuses = ["open", "resolved", "pending"];
+  const validTypes = ["bug", "feature_request", "complaint", "praise", "general"];
 
   let query = supabase
     .from("user_feedback")
@@ -113,17 +118,24 @@ export async function GET(req: Request) {
     .limit(limit);
 
   if (status) {
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json({ error: "Invalid status parameter" }, { status: 400 });
+    }
     query = query.eq("status", status);
   }
 
   if (type) {
+    if (!validTypes.includes(type)) {
+      return NextResponse.json({ error: "Invalid type parameter" }, { status: 400 });
+    }
     query = query.eq("feedback_type", type);
   }
 
   const { data, error } = await query;
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Feedback fetch error:", error.message);
+    return NextResponse.json({ error: "Failed to retrieve feedback data" }, { status: 500 });
   }
 
   return NextResponse.json({ feedback: data });

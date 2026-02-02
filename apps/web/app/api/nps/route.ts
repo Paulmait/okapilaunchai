@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabase";
 import { getSupabaseServer } from "../../../lib/supabase-server";
 import { checkRateLimit, RATE_LIMITS } from "../../../lib/rate-limit";
+import { isAdmin } from "../../../lib/admin";
 import { z } from "zod";
 
 const NpsSchema = z.object({
@@ -93,10 +94,16 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
 
+  // Verify admin access
+  if (!isAdmin(user.email)) {
+    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+  }
+
   const supabase = getSupabaseAdmin();
 
   const { searchParams } = new URL(req.url);
-  const days = Math.min(parseInt(searchParams.get("days") || "30"), 365);
+  const daysParam = parseInt(searchParams.get("days") || "30", 10);
+  const days = Math.min(isNaN(daysParam) ? 30 : daysParam, 365);
 
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
@@ -109,7 +116,8 @@ export async function GET(req: Request) {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("NPS GET error:", error.message);
+    return NextResponse.json({ error: "Failed to retrieve NPS data" }, { status: 500 });
   }
 
   // Calculate NPS score

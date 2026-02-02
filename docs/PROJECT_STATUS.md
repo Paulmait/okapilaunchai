@@ -162,6 +162,39 @@ git push  # Triggers Railway auto-deploy
 
 ---
 
+## Recent Changes (February 2, 2026)
+
+### Critical Security Fix
+- **CRITICAL**: Removed hardcoded Supabase service role key from `scripts/setup-db.mjs` - now uses environment variables
+- Script now requires `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` environment variables
+
+### Security Hardening (QC Review)
+- **NPS API**: Added admin role check to GET endpoint (was missing authorization)
+- **Download API**: Added explicit authentication check for non-anonymous projects
+- **Rate Limiting**: Improved client ID detection with multiple fallback headers (CF-Connecting-IP, X-Real-IP, X-Forwarded-For, fingerprint)
+- **Security Headers**: Added comprehensive security headers in `next.config.mjs`:
+  - X-Content-Type-Options: nosniff
+  - X-Frame-Options: DENY
+  - X-XSS-Protection: 1; mode=block
+  - Referrer-Policy: strict-origin-when-cross-origin
+  - Permissions-Policy for camera/microphone/geolocation
+  - API routes get additional Cache-Control: no-store
+
+### Error Message Security
+- Replaced error message leakage across all API routes with generic error messages
+- Backend errors now logged server-side only, not exposed to clients
+- Removed user IDs from console logs in webhook handlers
+
+### Input Validation Fixes
+- Fixed `parseInt` NaN handling in analytics, NPS, and feedback routes
+- Added enum validation for status and type parameters in feedback GET endpoint
+
+### Build Fixes
+- Fixed `useSearchParams()` Suspense boundary issues in `/subscribe` and `/subscribe/success` pages
+- Both pages now properly wrap content in Suspense with loading fallbacks
+
+---
+
 ## Recent Changes (January 7, 2026)
 
 ### Security Fixes (QC Review)

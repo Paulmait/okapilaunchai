@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-export default function SubscribeSuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const [loading, setLoading] = useState(true);
@@ -97,5 +97,33 @@ export default function SubscribeSuccessPage() {
         Need help? Contact us at support@okapilaunch.com
       </p>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div style={{ maxWidth: 500, margin: "0 auto", padding: "80px 20px", textAlign: "center" }}>
+      <div
+        style={{
+          width: 40,
+          height: 40,
+          border: "3px solid #e5e7eb",
+          borderTopColor: "#6366f1",
+          borderRadius: "50%",
+          animation: "spin 1s linear infinite",
+          margin: "0 auto"
+        }}
+      />
+      <p style={{ color: "#6b7280", marginTop: 16 }}>Loading...</p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+export default function SubscribeSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <SuccessContent />
+    </Suspense>
   );
 }

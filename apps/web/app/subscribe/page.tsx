@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import React, { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 const PLANS = {
@@ -35,9 +35,8 @@ const PLANS = {
   }
 };
 
-export default function SubscribePage() {
+function SubscribeContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const planKey = searchParams.get("plan") as "pro" | "team" | null;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -243,5 +242,33 @@ export default function SubscribePage() {
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div style={{ maxWidth: 500, margin: "0 auto", padding: "60px 20px", textAlign: "center" }}>
+      <div
+        style={{
+          width: 40,
+          height: 40,
+          border: "3px solid #e5e7eb",
+          borderTopColor: "#6366f1",
+          borderRadius: "50%",
+          animation: "spin 1s linear infinite",
+          margin: "0 auto"
+        }}
+      />
+      <p style={{ color: "#6b7280", marginTop: 16 }}>Loading...</p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+export default function SubscribePage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <SubscribeContent />
+    </Suspense>
   );
 }
