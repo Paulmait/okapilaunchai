@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import ClientWidgets from "../components/ClientWidgets";
 import Header from "../components/Header";
 import { Providers } from "../components/Providers";
+import CookieConsent from "../components/CookieConsent";
 
 export const viewport: Viewport = {
   themeColor: "#6366f1",
@@ -66,7 +67,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/logo.svg" />
+        <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#6366f1" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="OkapiLaunch" />
       </head>
       <body
         style={{
@@ -80,6 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           <main style={{ minHeight: "calc(100vh - 60px)" }}>{children}</main>
           <ClientWidgets />
+          <CookieConsent />
           <footer
           style={{
             padding: "40px 20px",

@@ -260,3 +260,47 @@ export const RATE_LIMITS = {
 export function isRedisEnabled(): boolean {
   return USE_REDIS && redis !== null;
 }
+
+/**
+ * Generate rate limit headers for API responses
+ * These headers inform clients about their rate limit status
+ *
+ * Standard headers follow the IETF draft:
+ * https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/
+ */
+export function getRateLimitHeaders(result: RateLimitResult, config: RateLimitConfig): Record<string, string> {
+  const resetSeconds = Math.max(0, Math.ceil((result.resetTime - Date.now()) / 1000));
+
+  return {
+    "X-RateLimit-Limit": config.limit.toString(),
+    "X-RateLimit-Remaining": result.remaining.toString(),
+    "X-RateLimit-Reset": resetSeconds.toString(),
+    "RateLimit-Limit": config.limit.toString(),
+    "RateLimit-Remaining": result.remaining.toString(),
+    "RateLimit-Reset": resetSeconds.toString(),
+  };
+}
+
+/**
+ * Create a rate limited response with proper headers
+ */
+export function rateLimitedResponse(result: RateLimitResult, config: RateLimitConfig): Response {
+  const headers = getRateLimitHeaders(result, config);
+  const resetSeconds = Math.max(0, Math.ceil((result.resetTime - Date.now()) / 1000));
+
+  return new Response(
+    JSON.stringify({
+      error: "Rate limit exceeded",
+      message: `Too many requests. Please try again in ${resetSeconds} seconds.`,
+      retryAfter: resetSeconds,
+    }),
+    {
+      status: 429,
+      headers: {
+        "Content-Type": "application/json",
+        "Retry-After": resetSeconds.toString(),
+        ...headers,
+      },
+    }
+  );
+}
