@@ -1,3 +1,5 @@
+import { withSentryConfig } from "@sentry/nextjs";
+
 /** @type {import('next').NextConfig} */
 
 // Content Security Policy configuration
@@ -5,11 +7,11 @@
 // In production, consider using nonces for stricter CSP
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.sentry.io;
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: blob: https://*.supabase.co;
   font-src 'self' data:;
-  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://api.openai.com https://api.anthropic.com;
+  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://api.openai.com https://api.anthropic.com https://*.ingest.sentry.io;
   frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
   frame-ancestors 'none';
   form-action 'self';
@@ -97,4 +99,28 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry configuration options
+const sentryWebpackPluginOptions = {
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+
+  // Only upload source maps in production
+  silent: true, // Suppresses all logs
+
+  // Upload source maps for better error tracking
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Auth token for uploading source maps (optional, only for CI/CD)
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  // Hide source maps from browser devtools in production
+  hideSourceMaps: true,
+
+  // Disable source map upload if no auth token
+  disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+  disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+};
+
+// Wrap the config with Sentry
+export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);

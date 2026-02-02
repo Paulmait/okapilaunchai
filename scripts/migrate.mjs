@@ -31,7 +31,8 @@ const migrations = [
   "0004_analytics_and_feedback.sql",
   "20260107_subscriptions.sql",
   "0005_admin_users.sql",
-  "0006_indexes_and_login_tracking.sql"
+  "0006_indexes_and_login_tracking.sql",
+  "0007_admin_password_rotation.sql"
 ];
 
 async function runMigrations() {

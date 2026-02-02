@@ -162,3 +162,134 @@ export function clearAdminCache(): void {
 export function clearAdminCacheForUser(userIdOrEmail: string): void {
   adminCache.delete(userIdOrEmail);
 }
+
+/**
+ * Check admin password rotation status
+ * Returns password expiry information for the admin user
+ */
+export async function checkPasswordRotationStatus(
+  userId: string
+): Promise<{
+  isExpired: boolean;
+  daysUntilExpiry: number;
+  needsRotation: boolean;
+  expiresAt: Date | null;
+} | null> {
+  try {
+    const supabase = getSupabaseAdmin();
+    const { data, error } = await supabase
+      .from("admin_users")
+      .select("password_expires_at, force_password_change")
+      .eq("user_id", userId)
+      .is("revoked_at", null)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const expiresAt = data.password_expires_at ? new Date(data.password_expires_at) : null;
+    const now = new Date();
+    const daysUntilExpiry = expiresAt
+      ? Math.floor((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      : 999;
+    const isExpired = expiresAt ? expiresAt < now : false;
+    const needsRotation = isExpired || data.force_password_change === true;
+
+    return {
+      isExpired,
+      daysUntilExpiry,
+      needsRotation,
+      expiresAt,
+    };
+  } catch (e) {
+    console.error("[Admin] Failed to check password rotation status:", e);
+    return null;
+  }
+}
+
+/**
+ * Mark admin password as changed (resets the 6-month timer)
+ */
+export async function markPasswordChanged(userId: string): Promise<boolean> {
+  try {
+    const supabase = getSupabaseAdmin();
+
+    // Call the database function
+    const { error } = await supabase.rpc("admin_password_changed", {
+      admin_user_id: userId,
+    });
+
+    if (error) {
+      console.error("[Admin] Failed to mark password changed:", error);
+      return false;
+    }
+
+    // Clear cache for this user
+    clearAdminCacheForUser(userId);
+
+    return true;
+  } catch (e) {
+    console.error("[Admin] Failed to mark password changed:", e);
+    return false;
+  }
+}
+
+/**
+ * Get all admins with passwords expiring within 14 days
+ * Useful for sending reminder emails
+ */
+export async function getAdminsWithExpiringPasswords(): Promise<
+  Array<{
+    id: string;
+    email: string;
+    daysUntilExpiry: number;
+    reminderSent: boolean;
+  }>
+> {
+  try {
+    const supabase = getSupabaseAdmin();
+    const { data, error } = await supabase.rpc("get_admins_with_expiring_passwords");
+
+    if (error || !data) {
+      return [];
+    }
+
+    return data.map((row: { id: string; email: string; days_until_expiry: number; reminder_sent: boolean }) => ({
+      id: row.id,
+      email: row.email,
+      daysUntilExpiry: row.days_until_expiry,
+      reminderSent: row.reminder_sent,
+    }));
+  } catch (e) {
+    console.error("[Admin] Failed to get admins with expiring passwords:", e);
+    return [];
+  }
+}
+
+/**
+ * Force an admin to change their password on next login
+ */
+export async function forcePasswordRotation(
+  adminUserId: string,
+  reason: string = "security_policy"
+): Promise<boolean> {
+  try {
+    const supabase = getSupabaseAdmin();
+    const { error } = await supabase.rpc("force_admin_password_rotation", {
+      admin_user_id: adminUserId,
+      reason,
+    });
+
+    if (error) {
+      console.error("[Admin] Failed to force password rotation:", error);
+      return false;
+    }
+
+    clearAdminCacheForUser(adminUserId);
+    return true;
+  } catch (e) {
+    console.error("[Admin] Failed to force password rotation:", e);
+    return false;
+  }
+}
