@@ -193,6 +193,21 @@ git push  # Triggers Railway auto-deploy
 - Fixed `useSearchParams()` Suspense boundary issues in `/subscribe` and `/subscribe/success` pages
 - Both pages now properly wrap content in Suspense with loading fallbacks
 
+### Infrastructure Improvements
+- **Redis Rate Limiting**: Added Upstash Redis support for multi-instance rate limiting
+  - Automatic fallback to in-memory if Redis not configured
+  - New async `checkRateLimitAsync()` function for Redis-backed limiting
+  - Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to enable
+- **Database-Backed Admin Roles**: New `admin_users` table and `admin_audit_log`
+  - Migration: `0005_admin_users.sql`
+  - `is_admin()` and `is_super_admin()` PostgreSQL functions
+  - `isAdminAsync()` function with caching (5 min TTL)
+  - Fallback to `ADMIN_EMAIL` env var if database not set up
+- **Content Security Policy**: Added CSP header in production
+  - Allows Stripe, Supabase, OpenAI, Anthropic connections
+  - HSTS enabled in production
+  - CSP disabled in development to avoid build issues
+
 ---
 
 ## Recent Changes (January 7, 2026)
