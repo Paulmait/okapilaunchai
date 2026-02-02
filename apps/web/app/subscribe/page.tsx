@@ -10,12 +10,9 @@ const PLANS = {
     price: "$29/month",
     features: [
       "Unlimited projects",
-      "Priority AI generation",
-      "In-app code editor",
-      "GitHub integration",
       "Full legal docs bundle",
-      "App Store asset pack",
-      "Export history (30 days)",
+      "In-app code editor (beta)",
+      "GitHub integration (beta)",
       "Email support"
     ]
   },
@@ -24,13 +21,10 @@ const PLANS = {
     price: "$79/month",
     features: [
       "Everything in Pro",
-      "5 team members",
-      "White-label exports",
-      "Custom branding",
-      "API access",
-      "Export history (1 year)",
-      "Priority support",
-      "Dedicated onboarding"
+      "Priority email support",
+      "Team features (coming soon)",
+      "API access (coming soon)",
+      "White-label exports (coming soon)"
     ]
   }
 };

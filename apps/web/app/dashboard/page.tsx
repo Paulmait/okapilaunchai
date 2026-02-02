@@ -75,19 +75,36 @@ export default function DashboardPage() {
     <main style={{ maxWidth: 900, margin: "0 auto", padding: "20px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <h1 style={{ margin: 0, color: "#1e1b4b" }}>My Projects</h1>
-        <Link
-          href="/new"
-          style={{
-            padding: "10px 16px",
-            background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-            color: "#fff",
-            borderRadius: 8,
-            textDecoration: "none",
-            fontWeight: 600
-          }}
-        >
-          + New Project
-        </Link>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <Link
+            href="/billing"
+            style={{
+              padding: "10px 16px",
+              backgroundColor: "#fff",
+              color: "#6b7280",
+              border: "1px solid #e5e7eb",
+              borderRadius: 8,
+              textDecoration: "none",
+              fontWeight: 500,
+              fontSize: 14
+            }}
+          >
+            Billing
+          </Link>
+          <Link
+            href="/new"
+            style={{
+              padding: "10px 16px",
+              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+              color: "#fff",
+              borderRadius: 8,
+              textDecoration: "none",
+              fontWeight: 600
+            }}
+          >
+            + New Project
+          </Link>
+        </div>
       </div>
 
       {error && (
