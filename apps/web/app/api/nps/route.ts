@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabase";
 import { getSupabaseServer } from "../../../lib/supabase-server";
-import { checkRateLimit, RATE_LIMITS } from "../../../lib/rate-limit";
-import { isAdmin } from "../../../lib/admin";
+import { checkRateLimit, getClientId, RATE_LIMITS } from "../../../lib/rate-limit";
+import { isAdmin, logAdminAction } from "../../../lib/admin";
 import { z } from "zod";
 
 const NpsSchema = z.object({
@@ -99,11 +99,19 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Admin access required" }, { status: 403 });
   }
 
-  const supabase = getSupabaseAdmin();
-
   const { searchParams } = new URL(req.url);
   const daysParam = parseInt(searchParams.get("days") || "30", 10);
   const days = Math.min(isNaN(daysParam) ? 30 : daysParam, 365);
+
+  // Log admin action
+  await logAdminAction(user.id, "view_nps", {
+    targetType: "nps",
+    metadata: { days },
+    ipAddress: getClientId(req),
+    userAgent: req.headers.get("user-agent") || undefined,
+  });
+
+  const supabase = getSupabaseAdmin();
 
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);

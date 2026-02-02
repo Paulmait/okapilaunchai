@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabase";
 import { getSupabaseServer } from "../../../lib/supabase-server";
 import { getAnalyticsSummary, getInvestorMetrics } from "../../../lib/analytics";
-import { isAdmin } from "../../../lib/admin";
+import { isAdmin, logAdminAction } from "../../../lib/admin";
+import { getClientId } from "../../../lib/rate-limit";
 
 export async function GET(req: Request) {
   // Require authentication
@@ -22,6 +23,15 @@ export async function GET(req: Request) {
   const type = searchParams.get("type") || "summary";
   const daysParam = parseInt(searchParams.get("days") || "30", 10);
   const days = Math.min(isNaN(daysParam) ? 30 : daysParam, 365);
+
+  // Log admin action
+  await logAdminAction(user.id, "view_analytics", {
+    targetType: "analytics",
+    targetId: type,
+    metadata: { type, days },
+    ipAddress: getClientId(req),
+    userAgent: req.headers.get("user-agent") || undefined,
+  });
 
   try {
     if (type === "summary") {

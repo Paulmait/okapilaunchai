@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabase";
 import { getSupabaseServer } from "../../../lib/supabase-server";
 import { checkRateLimit, getClientId, RATE_LIMITS } from "../../../lib/rate-limit";
-import { isAdmin } from "../../../lib/admin";
+import { isAdmin, logAdminAction } from "../../../lib/admin";
 import { z } from "zod";
 
 const FeedbackSchema = z.object({
@@ -99,11 +99,19 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Admin access required" }, { status: 403 });
   }
 
-  const supabase = getSupabaseAdmin();
-
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
   const type = searchParams.get("type");
+
+  // Log admin action
+  await logAdminAction(user.id, "view_feedback", {
+    targetType: "feedback",
+    metadata: { status, type },
+    ipAddress: getClientId(req),
+    userAgent: req.headers.get("user-agent") || undefined,
+  });
+
+  const supabase = getSupabaseAdmin();
   const limitParam = parseInt(searchParams.get("limit") || "50", 10);
   const limit = Math.min(isNaN(limitParam) ? 50 : limitParam, 100);
 
