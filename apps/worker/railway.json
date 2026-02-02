@@ -2,10 +2,11 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd /app && corepack enable && pnpm install && pnpm -r --filter @okapilaunch/core --filter @okapilaunch/ai-router --filter @okapilaunch/worker build"
+    "watchPatterns": ["apps/worker/**", "packages/**"],
+    "buildCommand": "corepack enable && pnpm install && pnpm --filter @okapilaunch/core build && pnpm --filter @okapilaunch/ai-router build && pnpm --filter @okapilaunch/worker build"
   },
   "deploy": {
-    "startCommand": "cd /app/apps/worker && node dist/main.js",
+    "startCommand": "node /app/apps/worker/dist/main.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
