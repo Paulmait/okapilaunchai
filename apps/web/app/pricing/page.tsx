@@ -31,12 +31,9 @@ const plans = [
     description: "For indie developers ready to ship",
     features: [
       "Unlimited projects",
-      "Priority AI generation",
-      "In-app code editor",
-      "GitHub integration",
       "Full legal docs bundle",
-      "App Store asset pack",
-      "Export history (30 days)",
+      "In-app code editor (beta)",
+      "GitHub integration (beta)",
       "Email support"
     ],
     cta: "Start Pro",
@@ -50,13 +47,10 @@ const plans = [
     description: "For agencies and teams",
     features: [
       "Everything in Pro",
-      "5 team members",
-      "White-label exports",
-      "Custom branding",
-      "API access",
-      "Export history (1 year)",
-      "Priority support",
-      "Dedicated onboarding"
+      "Priority email support",
+      "Team features (coming soon)",
+      "API access (coming soon)",
+      "White-label exports (coming soon)"
     ],
     cta: "Start Team",
     href: "/subscribe?plan=team",
@@ -65,14 +59,13 @@ const plans = [
 ];
 
 const comparisonFeatures = [
-  { feature: "Free tier", us: true, them: false },
+  { feature: "Free tier available", us: true, them: false },
   { feature: "App Store compliance", us: true, them: false },
-  { feature: "Legal docs included", us: true, them: false },
+  { feature: "Legal docs auto-generated", us: true, them: false },
   { feature: "Transparent pricing", us: true, them: false },
-  { feature: "Deterministic output", us: true, them: false },
+  { feature: "Own your code (no lock-in)", us: true, them: false },
   { feature: "No hidden credits", us: true, them: false },
-  { feature: "Delete-my-data flow", us: true, them: false },
-  { feature: "Export to Expo", us: true, them: true }
+  { feature: "Export to Expo/React Native", us: true, them: true }
 ];
 
 export default function PricingPage() {
@@ -227,16 +220,16 @@ export default function PricingPage() {
               a: "No! The free tier requires no credit card. Just sign up and start building your app immediately."
             },
             {
-              q: "What makes OkapiLaunch different from other AI app builders?",
-              a: "We focus on App Store compliance from day one. Every app includes proper legal docs, delete-my-data flows, and follows Apple's guidelines. No surprises at review time."
+              q: "What does 'beta' mean for features?",
+              a: "Features marked as beta are functional but still being improved. The code editor and GitHub integration work but have limited functionality. We're actively developing these based on user feedback."
             },
             {
               q: "Can I export my app and own the code?",
               a: "Yes! You get a complete Expo/React Native project that you fully own. No vendor lock-in, no ongoing fees to keep your app running."
             },
             {
-              q: "What if my app gets rejected from the App Store?",
-              a: "Pro and Team plans include an App Store submission guide. We also provide common rejection reasons and how to fix them. Our compliance-first approach minimizes rejections."
+              q: "What Team features are coming soon?",
+              a: "We're building team collaboration (shared projects, member management), API access for automation, and white-label exports. Subscribe to Team now to lock in the price and get these features as they launch."
             }
           ].map((faq, i) => (
             <div key={i} style={{ padding: 24, backgroundColor: "#fff", borderRadius: 12, border: "1px solid #e0e7ff" }}>
